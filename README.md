@@ -7,7 +7,7 @@ A new kind of optimization algorithm that applies ray tracing principles from co
 - **59% improvement** in validation perplexity (282 → 116) on 29M parameter transformer
 - **100% training completion rate** vs 20% for standard optimizers
 - **Zero divergence** across 30 epochs while Adam/AdamW fail after 6 epochs
-- **Scale-invariant performance** demonstrated on 10M and 29M parameter models
+- **Scale-invariant performance** demonstrated on 2.5M, 10M and 29M parameter models
 
 ## Paper
 

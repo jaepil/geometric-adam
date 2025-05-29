@@ -199,7 +199,8 @@ Geometric Adam excels in scenarios requiring:
 @misc{jeong2025geometric,
   title={Geometric Adam: Ray Tracing-Inspired Adaptive Optimization},
   author={Jeong, Jaepil},
-  institution={Cognica, Inc.}
+  institution={Cognica, Inc.},
+  journal = {OSF Preprints},
   year={2025},
   eprint={10.31219/osf.io/dm5hn_v1},
   code={https://github.com/jaepil/geometric-adam},

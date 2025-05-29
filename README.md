@@ -196,12 +196,15 @@ Geometric Adam excels in scenarios requiring:
 ## 📚 Citation
 
 ```bibtex
-@article{jeong2025geometric,
-  title={Geometric Adam: A Ray Tracing-Inspired Approach to Neural Network Optimization},
+@misc{jeong2025geometric,
+  title={Geometric Adam: Ray Tracing-Inspired Adaptive Optimization},
   author={Jeong, Jaepil},
-  journal={OSF},
-  year={2025},
   institution={Cognica, Inc.}
+  journal={OSF Preprints},
+  year={2025},
+  eprint={10.31219/osf.io/dm5hn_v1},
+  code={https://github.com/jaepil/geometric-adam},
+  url={https://doi.org/10.31219/osf.io/dm5hn_v1}
 }
 ```
 

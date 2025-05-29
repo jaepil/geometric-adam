@@ -1,19 +1,19 @@
-# Geometric Adam: Ray Tracing-Inspired Neural Network Optimization
+# Geometric Adam: Ray Tracing-Inspired Adaptive Optimization
 
 A new kind of optimization algorithm that applies ray tracing principles from computer graphics to neural network training, achieving unprecedented stability and performance improvements.
 
-## 🚀 Key Results
+## Key Results
 
 - **59% improvement** in validation perplexity (282 → 116) on 29M parameter transformer
 - **100% training completion rate** vs 20% for standard optimizers
 - **Zero divergence** across 30 epochs while Adam/AdamW fail after 6 epochs
 - **Scale-invariant performance** demonstrated on 10M and 29M parameter models
 
-## 📝 Paper
+## Paper
 
-This repository implements the research presented in [**"Geometric Adam: A Ray Tracing-Inspired Approach to Neural Network Optimization"**](https://github.com/jaepil/geometric-adam) by Jaepil Jeong.
+This repository implements the research presented in [**"Geometric Adam: A Ray Tracing-Inspired Adaptive Optimization"**](https://github.com/jaepil/geometric-adam) by Jaepil Jeong.
 
-## 🔬 Core Innovation
+## Core Innovation
 
 Geometric Adam treats gradient descent as light propagation through media with varying optical density:
 
@@ -35,7 +35,7 @@ The optimizer adapts to loss landscape geometry by:
 2. Estimating local curvature from geometric properties
 3. Applying exponential step size reduction via refraction coefficients
 
-## 📊 Experimental Results
+## Experimental Results
 
 ### Performance Comparison (29M Parameter Transformer on WikiText-2)
 
@@ -51,7 +51,7 @@ The optimizer adapts to loss landscape geometry by:
 
 *Geometric Adam (pink) maintains stable convergence throughout 30 epochs while standard optimizers diverge catastrophically.*
 
-## 🛠️ Implementation
+## Implementation
 
 ### Geometric Adam Optimizer
 
@@ -79,49 +79,7 @@ class GeometricAdam(torch.optim.Optimizer):
     """
 ```
 
-## 📁 Repository Structure
-
-### Training Scripts
-
-- `transformer-29M.py` - Main 29M parameter transformer experiments
-- `transformer-10M.py` - 10M parameter scale validation
-- `transformer-1B.py` - Billion parameter scale testing
-
-### Experimental Results
-
-- `checkpoints_29m/` - Saved model checkpoints
-- `checkpoints_10m/` - 10M parameter experiment results
-- `logs/` - Detailed training logs
-- `*.png` - Visualization plots and figures
-- `*.json` - Quantitative experimental results
-
-### Key Files
-
-- `optimizer_results_29m.json` - Comprehensive 29M parameter results
-- `optimizer_results_10m.json` - 10M parameter comparison data
-- Training evolution plots and loss landscape visualizations
-
-## 🚀 Quick Start
-
-### Installation
-
-```bash
-git clone https://github.com/jaepil/geometric-adam
-cd ray
-pip install torch torchvision numpy matplotlib seaborn pandas
-```
-
-### Run Experiments
-
-```bash
-# 29M parameter transformer experiment
-python transformer-29M.py
-
-# 10M parameter transformer experiment
-python transformer-10M.py
-```
-
-## 📈 Theoretical Framework
+## Theoretical Framework
 
 ### Large-Angle Discovery
 
@@ -136,30 +94,7 @@ Our research reveals that successful optimization operates in the **large-angle 
 - **Efficient saddle point escape** in non-convex settings
 - **Robustness to systematic estimation errors** (21% curvature underestimation)
 
-## 🔬 Advanced Features
-
-### Memory-Efficient Implementation
-
-```python
-# Reduced memory variant (47% memory reduction)
-optimizer = GeometricAdam(
-    model.parameters(),
-    memory_efficient=True,
-    quantization_bits=8
-)
-```
-
-### Comprehensive Monitoring
-
-```python
-# With advanced logging
-from transformer_29M import ExperimentLogger
-
-logger = ExperimentLogger("geometric_adam_experiment")
-logger.log_metrics({"loss": loss.item(), "lr": lr}, step)
-```
-
-## 🔮 Future Directions
+## Future Directions
 
 ### Reflection-Based Extensions
 
@@ -169,12 +104,13 @@ The paper proposes exciting extensions incorporating **Phong reflection models**
 - **Recursive reflection**: Multi-bounce optimization trajectories
 - **Cook-Torrance BRDF**: Physically-based rendering for optimization
 
-## 📊 Experimental Validation
+## Experimental Validation
 
 ### Scale Invariance
 
 | Model Size | Training Epochs | Angular Changes | Performance |
 |------------|-----------------|-----------------|-------------|
+| 2.5M params | 100 epochs | 1.45 ± 0.28 rad | Stable |
 | 10M params | 53 epochs | 1.47 ± 0.29 rad | Stable |
 | 29M params | 30 epochs | 1.48 ± 0.31 rad | Stable |
 
@@ -184,7 +120,7 @@ The paper proposes exciting extensions incorporating **Phong reflection models**
 - **Cohen's d > 4** indicating very large effect sizes
 - **Consistent across multiple random seeds**
 
-## 🎯 Applications
+## Applications
 
 Geometric Adam excels in scenarios requiring:
 
@@ -193,7 +129,7 @@ Geometric Adam excels in scenarios requiring:
 - **Long training schedules** without divergence
 - **Superior final performance** over training speed
 
-## 📚 Citation
+## Citation
 
 ```bibtex
 @misc{jeong2025geometric,
@@ -208,7 +144,7 @@ Geometric Adam excels in scenarios requiring:
 }
 ```
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions to extend and improve Geometric Adam:
 
@@ -218,6 +154,6 @@ We welcome contributions to extend and improve Geometric Adam:
 - Theoretical analysis
 - Experimental validation
 
-## 📄 License
+## License
 
 MIT License

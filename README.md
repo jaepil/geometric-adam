@@ -47,7 +47,8 @@ The optimizer adapts to loss landscape geometry by:
 
 ### Training Stability
 
-![Optimizer Comparison](optimizer_comparison.png)
+![Optimizer Comparison 2.5M](transformer_2.5M_comparison.png)
+![Optimizer Comparison 29M](transformer_29M_comparison.png)
 
 *Geometric Adam (pink) maintains stable convergence throughout 30 epochs while standard optimizers diverge catastrophically.*
 

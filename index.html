@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geometric Adam: Interactive Analysis</title>
+    <!-- Chosen Palette: Custom - Warm Neutrals (Calm Harmony) -->
+    <!-- Application Structure Plan: A narrative-driven, single-page application designed for intuitive exploration. The structure flows from a high-level problem statement to the proposed solution, its mechanism, performance proof, key discoveries, and future outlook. This thematic and storytelling approach was chosen over a linear report structure to enhance user engagement and comprehension, guiding the user through the complex findings of the paper in a logical, digestible sequence. Key interactions include dynamic charts and content toggles to explore data for different model sizes. Gemini API features are added to explain complex concepts and brainstorm future research. -->
+    <!-- Visualization & Content Choices: 
+        - Problem (Inform/Compare): Donut chart (Chart.js) to starkly show training completion failure of standard methods vs. GA's success. Goal is immediate impact.
+        - Performance (Compare/Change): Line chart (Chart.js) to visualize PPL over time, clearly showing GA's stability against the divergence of others. Goal is to prove superiority.
+        - Mechanism (Organize): HTML/CSS-based flowchart (Tailwind) to explain the algorithm's steps without complex graphics. Goal is process clarity.
+        - Angle Discovery (Compare/Inform): Bar chart (Chart.js) to show the consistency of the 'large-angle' phenomenon across scales. Goal is to highlight a key scientific finding. ✨ Gemini button to explain the concept simply.
+        - Perplexity Paradox (Compare/Inform): Interactive text blocks (HTML/JS) to compare qualitative text outputs. A chart would fail to capture this nuance; text comparison is direct and powerful. An interactive toggle allows users to explore data for different model scales. ✨ Gemini button to explain the paradox.
+        - Future (Explore): ✨ Gemini button to brainstorm future research ideas based on the reflection mechanism.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F4; /* Warm Off-white */
+            color: #3D405B; /* Dark Desaturated Blue */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .accent-color { color: #E07A5F; } /* Terracotta */
+        .accent-bg { background-color: #E07A5F; }
+        .secondary-accent-color { color: #81B29A; } /* Muted Green */
+        .secondary-accent-bg { background-color: #81B29A; }
+        .flow-step {
+            border: 2px solid #81B29A;
+            background-color: #f0fdf4;
+        }
+        .nav-button {
+            transition: all 0.2s ease-in-out;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-button:hover, .nav-button.active {
+            border-bottom-color: #E07A5F;
+            color: #E07A5F;
+        }
+        .interactive-button {
+            transition: all 0.2s;
+        }
+        .interactive-button.active {
+            background-color: #3D405B;
+            color: white;
+        }
+        .gemini-button {
+            background-color: #f0eafc;
+            color: #5b21b6;
+            transition: all 0.2s;
+        }
+        .gemini-button:hover {
+            background-color: #e9d5ff;
+            transform: translateY(-2px);
+        }
+        .modal-overlay {
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="sticky top-0 bg-white/80 backdrop-blur-lg z-10 shadow-sm">
+        <nav class="container mx-auto px-6 py-3">
+            <ul class="flex justify-center space-x-4 md:space-x-8 text-sm md:text-base font-medium text-gray-600">
+                <li><a href="#problem" class="nav-button pb-1">The Problem</a></li>
+                <li><a href="#solution" class="nav-button pb-1">The Solution</a></li>
+                <li><a href="#performance" class="nav-button pb-1">Performance</a></li>
+                <li><a href="#discoveries" class="nav-button pb-1">Discoveries</a></li>
+                <li><a href="#future" class="nav-button pb-1">Future</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 md:px-8 md:py-12">
+        <section class="text-center my-12 md:my-20">
+            <h1 class="text-4xl md:text-6xl font-bold tracking-tight text-gray-900">Geometric Adam</h1>
+            <p class="mt-4 text-lg md:text-xl text-gray-600">A Next-Generation Optimizer Inspired by Ray Tracing</p>
+        </section>
+
+        <div class="space-y-16 md:space-y-24">
+
+            <section id="problem" class="scroll-mt-20">
+                <div class="card p-6 md:p-8">
+                    <h2 class="text-2xl md:text-3xl font-bold text-center mb-2">The 'Invisible Wall' in Large-Scale Model Training</h2>
+                    <p class="text-center text-gray-500 mb-8">Why do standard optimizers collapse when facing massive models?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div class="space-y-4">
+                            <p class="text-lg">The scale of AI models today is growing exponentially. However, when models exceed a certain size (e.g., 29 million parameters), standard optimizers like Adam/AdamW often become unstable and <strong class="accent-color">fail completely (diverge)</strong> early in training.</p>
+                            <p>This is a critical problem that wastes enormous computational resources and time. The chart below starkly illustrates the success rate of GA versus conventional methods when training a 29M parameter model.</p>
+                        </div>
+                        <div class="chart-container h-64 md:h-auto">
+                            <canvas id="completionRateChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="solution" class="scroll-mt-20">
+                 <div class="card p-6 md:p-8 text-center">
+                    <h2 class="text-2xl md:text-3xl font-bold mb-8">The Solution: 'Seeing' the Geometry of the Loss Landscape</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="flex flex-col items-center p-4">
+                            <span class="text-5xl mb-4">💡</span>
+                            <h3 class="text-xl font-bold mb-2">Physics-Inspired</h3>
+                            <p class="text-gray-600">It reinterprets gradient descent as <strong class="secondary-accent-color">ray tracing</strong>, where light passes through media of varying densities. It automatically reduces the learning rate in rugged areas with high 'curvature' to ensure stability.</p>
+                        </div>
+                         <div class="flex flex-col items-center p-4">
+                            <span class="text-5xl mb-4">⚙️</span>
+                            <h3 class="text-xl font-bold mb-2">Core Mechanism</h3>
+                            <p class="text-gray-600">It approximates curvature by measuring the <strong class="secondary-accent-color">'angle change (θ)'</strong> between consecutive gradient vectors, then passes this through an exponential function to calculate a <strong class="secondary-accent-color">'refraction index (r)'</strong> that dynamically scales the learning rate.</p>
+                        </div>
+                         <div class="flex flex-col items-center p-4">
+                            <span class="text-5xl mb-4">🏆</span>
+                            <h3 class="text-xl font-bold mb-2">Result: Stability & Performance</h3>
+                            <p class="text-gray-600">It achieves a <strong class="secondary-accent-color">100% success rate</strong> on large models where others fail, and ultimately delivers 56% better performance (Perplexity), unlocking the model's full potential.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="performance" class="scroll-mt-20">
+                 <div class="card p-6 md:p-8">
+                    <h2 class="text-2xl md:text-3xl font-bold text-center mb-2">Performance Showdown: 29M Parameter Model</h2>
+                    <p class="text-center text-gray-500 mb-8">How stability leads to a dramatic performance gap</p>
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center">
+                        <div class="lg:col-span-3 chart-container h-80 md:h-96">
+                            <canvas id="perplexityChart"></canvas>
+                        </div>
+                        <div class="lg:col-span-2 space-y-4">
+                            <p>On the most challenging 29M model, Geometric Adam demonstrated overwhelming stability. While Adam and AdamW diverged after just 6 epochs with exploding perplexity, GA continued to learn steadily for all 30 epochs.</p>
+                            <p class="font-bold">This is more than just training longer; it means reaching a deeper, superior optimum that was <strong class="accent-color">simply unreachable</strong> by other optimizers.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="discoveries" class="scroll-mt-20 space-y-16 md:space-y-24">
+                <div class="card p-6 md:p-8">
+                    <h2 class="text-2xl md:text-3xl font-bold text-center mb-2">Key Discovery 1: The Perplexity Paradox</h2>
+                    <p class="text-center text-gray-500 mb-8">Does a lower score always mean a 'better' model?</p>
+                    <div class="text-center mb-6">
+                        <div id="paradox-controls" class="inline-flex rounded-md shadow-sm" role="group">
+                            <button type="button" data-model="small" class="interactive-button px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 active">2.5M Model Comparison</button>
+                            <button type="button" data-model="cross" class="interactive-button px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-r border-gray-200 hover:bg-gray-100">2.5M vs 10M Comparison</button>
+                        </div>
+                    </div>
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                        <div class="space-y-4">
+                           <h3 id="paradox-title" class="text-xl font-semibold text-center text-gray-800">2.5M Model: PPL Score vs. Generation Quality</h3>
+                           <p id="paradox-desc" class="text-center text-gray-600 text-sm mb-4">GA, with a 43% worse PPL score, produced more logical sentences.</p>
+                           <div class="text-center">
+                               <button id="explain-paradox" class="gemini-button font-semibold py-2 px-4 rounded-lg inline-flex items-center">
+                                   <span>✨</span> Explain Simply
+                               </button>
+                           </div>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                             <div class="grid grid-cols-1 gap-4">
+                                <div id="paradox-ga-card">
+                                    <p class="font-semibold text-base">GA <span class="text-xs font-normal text-red-500">(PPL 147.77)</span></p>
+                                    <p class="bg-green-50 text-green-800 p-3 rounded-md text-sm">"The king ruled his kingdom wisely, and peace lasted for decades." (High Coherence)</p>
+                                </div>
+                                 <div id="paradox-adam-card">
+                                    <p class="font-semibold text-base">Adam <span class="text-xs font-normal text-green-600">(PPL 103.40)</span></p>
+                                    <p class="bg-red-50 text-red-800 p-3 rounded-md text-sm">"The king was born yesterday, and his son was 30 years old." (Logical Contradiction)</p>
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-6 md:p-8">
+                     <h2 class="text-2xl md:text-3xl font-bold text-center mb-2">Key Discovery 2: The Secret of 'Large Angles'</h2>
+                    <p class="text-center text-gray-500 mb-8">The actual path of optimization is far rockier than theory suggests.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div class="space-y-4">
+                             <p>While theory often assumes that the gradient's direction changes gently, experiments show the average angle change during training is about <strong class="accent-color">85 degrees (1.48 radians)</strong>. This phenomenon is consistent regardless of model size.</p>
+                            <p>This discovery suggests that GA's success lies not in accurately 'measuring' curvature, but in its ability to 'robustly detect' these sharp turns and react to them monotonically, a property defined as <strong class="accent-color">Robustness</strong>.</p>
+                            <div class="text-center mt-4">
+                               <button id="explain-angles" class="gemini-button font-semibold py-2 px-4 rounded-lg inline-flex items-center">
+                                   <span>✨</span> Explain Simply
+                               </button>
+                           </div>
+                        </div>
+                        <div class="chart-container h-64 md:h-auto">
+                            <canvas id="angleChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <section id="future" class="scroll-mt-20">
+                <div class="card p-6 md:p-8 text-center">
+                    <h2 class="text-2xl md:text-3xl font-bold mb-8">Next Steps: The Future of Geometric Optimization</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                         <div class="flex flex-col items-center p-4">
+                            <span class="text-5xl mb-4">💎</span>
+                            <h3 class="text-xl font-bold mb-2">Reflection Mechanism</h3>
+                            <p class="text-gray-600">Moving beyond light 'refraction' to incorporate 'reflection'. This means advancing from simply slowing down to actively 'bouncing' out of dead ends or saddle points for more efficient exploration.</p>
+                        </div>
+                        <div class="flex flex-col items-center p-4">
+                             <span class="text-5xl mb-4">⚡️</span>
+                            <h3 class="text-xl font-bold mb-2">Hardware Acceleration</h3>
+                            <p class="text-gray-600">Leveraging dedicated Ray Tracing cores in GPUs to dramatically reduce GA's computational overhead from 3.2x to a potential 1.3x, making its stability accessible to more researchers and developers.</p>
+                        </div>
+                    </div>
+                    <div class="mt-8 border-t pt-8">
+                         <h3 class="text-xl font-bold mb-4">Explore Potential Research Paths</h3>
+                         <p class="text-gray-600 mb-4">Click the button below to brainstorm creative research ideas based on the "Reflection Mechanism" concept.</p>
+                         <button id="explore-research" class="gemini-button font-semibold py-2 px-4 rounded-lg inline-flex items-center">
+                           <span>✨</span> Explore Future Research
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+    
+    <footer class="text-center mt-16 md:mt-24 py-8 border-t border-gray-200">
+        <p class="text-gray-600">This interactive analysis is based on the paper "Geometric Adam: Ray Tracing-Inspired Adaptive Optimization."</p>
+        <p class="text-sm text-gray-500 mt-2">Generated on: June 6, 2025</p>
+    </footer>
+
+    <!-- Gemini Modal -->
+    <div id="gemini-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+        <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col scale-95 opacity-0">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 id="modal-title" class="text-xl font-bold"></h3>
+                <button id="modal-close" class="text-gray-500 hover:text-gray-800">&times;</button>
+            </div>
+            <div id="modal-body" class="p-6 overflow-y-auto space-y-4">
+                <!-- Content will be injected here -->
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const FONT_COLOR = '#3D405B'; 
+        const GRID_COLOR = '#EAEAEA'; 
+        const PALETTE = {
+            primary: '#E07A5F', // Terracotta
+            secondary: '#81B29A', // Muted Green
+            tertiary: '#3D405B', // Dark Blue
+            fail: '#EF4444', // Red
+            success: '#22C55E' // Green
+        };
+
+        const wrapLabels = (labels, maxLen = 16) => {
+            return labels.map(label => {
+                if (typeof label !== 'string' || label.length <= maxLen) {
+                    return label;
+                }
+                const words = label.split(' ');
+                const lines = [];
+                let currentLine = '';
+                for (const word of words) {
+                    if ((currentLine + ' ' + word).length > maxLen && currentLine.length > 0) {
+                        lines.push(currentLine);
+                        currentLine = word;
+                    } else {
+                        currentLine = currentLine ? currentLine + ' ' + word : word;
+                    }
+                }
+                lines.push(currentLine);
+                return lines;
+            });
+        };
+        
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            if (!item) return '';
+            let label = item.chart.data.labels[item.dataIndex];
+            return Array.isArray(label) ? label.join(' ') : label;
+        };
+
+        const defaultChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: FONT_COLOR, font: { size: 14, family: "'Inter', sans-serif" } }
+                },
+                tooltip: {
+                    callbacks: { title: tooltipTitleCallback },
+                    bodyFont: { size: 12, family: "'Inter', sans-serif" },
+                    titleFont: { size: 14, weight: 'bold', family: "'Inter', sans-serif" }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: FONT_COLOR, font: { size: 12, family: "'Inter', sans-serif" }},
+                    grid: { color: GRID_COLOR }
+                },
+                y: {
+                    ticks: { color: FONT_COLOR, font: { size: 12, family: "'Inter', sans-serif" }},
+                    grid: { color: GRID_COLOR }
+                }
+            }
+        };
+
+        new Chart(document.getElementById('completionRateChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Geometric Adam (Success)', 'Adam/AdamW (Failure)'],
+                datasets: [{
+                    label: 'Training Completion Rate (29M Model)',
+                    data: [100, 20],
+                    backgroundColor: [PALETTE.secondary, PALETTE.primary],
+                    borderColor: '#FFFFFF',
+                    borderWidth: 4,
+                }]
+            },
+            options: { 
+                ...defaultChartOptions, 
+                plugins: { 
+                    ...defaultChartOptions.plugins, 
+                    legend: { 
+                        position: 'bottom', 
+                        labels: {
+                           ...defaultChartOptions.plugins.legend.labels,
+                            padding: 20 
+                        }
+                    } 
+                }, 
+                scales: { x: { display: false }, y: { display: false } } 
+            }
+        });
+
+        new Chart(document.getElementById('perplexityChart'), {
+            type: 'line',
+            data: {
+                labels: ['Epoch 1', 'Epoch 6', 'Epoch 12', 'Epoch 18', 'Epoch 24', 'Epoch 30'],
+                datasets: [
+                    { label: 'Geometric Adam', data: [282, 158, 135, 125, 120, 116], borderColor: PALETTE.secondary, backgroundColor: PALETTE.secondary + '33', fill: true, tension: 0.3 },
+                    { label: 'Adam / AdamW', data: [281, 260, null, null, null, null], borderColor: PALETTE.primary, borderDash: [5, 5], fill: false, tension: 0.3 }
+                ]
+            },
+            options: { ...defaultChartOptions, scales: { ...defaultChartOptions.scales, y: { ...defaultChartOptions.scales.y, title: { display: true, text: 'Validation Perplexity', color: FONT_COLOR, font: {size: 14}} }, x: { ...defaultChartOptions.scales.x, title: { display: true, text: 'Epoch', color: FONT_COLOR, font: {size: 14}} } },
+                plugins: {
+                    ...defaultChartOptions.plugins,
+                    tooltip: {
+                        ...defaultChartOptions.plugins.tooltip,
+                        callbacks: {
+                            ...defaultChartOptions.plugins.tooltip.callbacks,
+                            afterBody: function(context) {
+                                if(context[0].dataset.label.includes('Adam') && context[0].dataIndex === 1) {
+                                    return 'Diverged and training stopped.';
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('angleChart'), {
+            type: 'bar',
+            data: {
+                labels: ['2.5M Model', '10M Model', '29M Model'],
+                datasets: [{
+                    label: 'Average Angle Change (Radians)',
+                    data: [1.45, 1.47, 1.48],
+                    backgroundColor: [PALETTE.primary + '99', PALETTE.primary + 'CC', PALETTE.primary],
+                    borderWidth: 0,
+                }]
+            },
+            options: { ...defaultChartOptions, indexAxis: 'y', plugins: { ...defaultChartOptions.plugins, legend: { display: false } }, scales: { ...defaultChartOptions.scales, x: { ...defaultChartOptions.scales.x, suggestedMin: 1.4, title: { display: true, text: 'Radians', color: FONT_COLOR, font: {size: 14}}} } }
+        });
+        
+        const paradoxControls = document.getElementById('paradox-controls');
+        const paradoxTitle = document.getElementById('paradox-title');
+        const paradoxDesc = document.getElementById('paradox-desc');
+        const paradoxGaCard = document.getElementById('paradox-ga-card');
+        const paradoxAdamCard = document.getElementById('paradox-adam-card');
+
+        const paradoxData = {
+            small: {
+                title: "2.5M Model: PPL Score vs. Generation Quality",
+                desc: "GA, with a 43% worse PPL score, produced more logical sentences.",
+                ga: { optimizer: "GA", ppl: 147.77, ppl_color: "red", text: `"The king ruled his kingdom wisely, and peace lasted for decades." (High Coherence)` },
+                adam: { optimizer: "Adam", ppl: 103.40, ppl_color: "green", text: `"The king was born yesterday, and his son was 30 years old." (Logical Contradiction)` }
+            },
+            cross: {
+                title: "2.5M GA vs. 10M Adam: Scale vs. Strategy",
+                desc: "The 4x smaller GA model produced more coherent sentences than the larger Adam model.",
+                ga: { optimizer: "GA (2.5M)", ppl: 147.77, ppl_color: "red", text: `"The king ruled his kingdom wisely, and peace lasted for decades." (High Coherence)` },
+                adam: { optimizer: "Adam (10M)", ppl: 108.95, ppl_color: "green", text: `"The princess was sad. So he smiled. The dragon sang tomorrow." (Incoherent)` }
+            }
+        };
+
+        function updateParadoxView(modelType) {
+            const data = paradoxData[modelType];
+            paradoxTitle.textContent = data.title;
+            paradoxDesc.textContent = data.desc;
+            paradoxGaCard.innerHTML = `<p class="font-semibold text-base">${data.ga.optimizer} <span class="text-xs font-normal text-${data.ga.ppl_color}-500">(PPL ${data.ga.ppl})</span></p><p class="bg-green-50 text-green-800 p-3 rounded-md text-sm">${data.ga.text}</p>`;
+            paradoxAdamCard.innerHTML = `<p class="font-semibold text-base">${data.adam.optimizer} <span class="text-xs font-normal text-${data.adam.ppl_color}-500">(PPL ${data.adam.ppl})</span></p><p class="bg-red-50 text-red-800 p-3 rounded-md text-sm">${data.adam.text}</p>`;
+        
+             paradoxControls.querySelectorAll('button').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.model === modelType) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        paradoxControls.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                updateParadoxView(e.target.dataset.model);
+            }
+        });
+
+        // Smooth scrolling for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetElement = document.querySelector(this.getAttribute('href'));
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Active nav link highlighting on scroll
+        const sections = document.querySelectorAll('main section');
+        const navLinks = document.querySelectorAll('nav ul li a');
+        window.onscroll = () => {
+          let current = "problem";
+
+          sections.forEach((section) => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 100) {
+              current = section.getAttribute("id");
+            }
+          });
+          
+          if(current === 'discoveries') { 
+              current = 'discoveries';
+          }
+
+          navLinks.forEach((a) => {
+            a.classList.remove("active");
+            if (a.getAttribute('href').includes(current)) {
+              a.classList.add("active");
+            }
+          });
+        };
+        
+        // Gemini API and Modal Logic
+        const modal = document.getElementById('gemini-modal');
+        const modalOverlay = modal;
+        const modalContent = modal.querySelector('.modal-content');
+        const modalTitle = document.getElementById('modal-title');
+        const modalBody = document.getElementById('modal-body');
+        const modalClose = document.getElementById('modal-close');
+
+        function showModal(title, body) {
+            modalTitle.textContent = title;
+            modalBody.innerHTML = body;
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalOverlay.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function hideModal() {
+            modalOverlay.classList.add('opacity-0');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        modalClose.addEventListener('click', hideModal);
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                hideModal();
+            }
+        });
+
+        async function callGemini(prompt) {
+            showModal("✨ Generating...", '<div class="flex justify-center items-center h-32"><div class="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-500"></div></div>');
+            
+            const chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+            const payload = { contents: chatHistory };
+            const apiKey = ""; // Left empty as per instruction
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+                    let text = result.candidates[0].content.parts[0].text;
+                    text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-purple-700">$1</strong>');
+                    text = text.replace(/\n/g, '<br>');
+                    return text;
+                } else {
+                    throw new Error("Unexpected response format from API.");
+                }
+            } catch (error) {
+                console.error("Gemini API call failed:", error);
+                return `<p class="text-red-500">Sorry, something went wrong while generating the explanation. Please try again later.</p><p class="text-xs text-gray-500 mt-2">${error.message}</p>`;
+            }
+        }
+        
+        document.getElementById('explain-paradox').addEventListener('click', async () => {
+            const prompt = `Based on the following context, explain the "Perplexity Paradox" in simple, intuitive terms for a non-expert.
+
+Context: A language model (Model A) has a lower (better) perplexity score than Model B. However, when generating text, Model A produces illogical sentences (e.g., "The king was born yesterday, and his son was 30"), while Model B produces coherent, logical sentences (e.g., "The king ruled his kingdom wisely...").
+
+Explain why this might happen and what it implies about perplexity as a primary evaluation metric for language models. Use analogies if helpful.`;
+            const explanation = await callGemini(prompt);
+            showModal("✨ The Perplexity Paradox Explained", explanation);
+        });
+
+        document.getElementById('explain-angles').addEventListener('click', async () => {
+            const prompt = `Explain the concept of "large-angle dynamics" in neural network optimization in a simple and intuitive way for a non-expert.
+
+Context: Imagine training a model is like hiking down a mountain in the fog to find the lowest point. Standard optimization theories often assume the path is relatively smooth, with only gentle turns (small angles). However, experiments show that the actual path is more like a treacherous, zigzagging trail with many sharp, sudden turns (large angles, averaging 85 degrees).
+
+Explain why this discovery is significant and how an optimizer that is built to handle these sharp turns (like Geometric Adam) might have an advantage.`;
+            const explanation = await callGemini(prompt);
+            showModal("✨ Large Angle Dynamics Explained", explanation);
+        });
+        
+        document.getElementById('explore-research').addEventListener('click', async () => {
+            const prompt = `Based on the idea of a "Reflection Mechanism" for an AI optimizer, inspired by how light reflects off surfaces, brainstorm 3-4 creative and specific future research project ideas.
+
+Context: The goal of the "Reflection Mechanism" is to help the optimizer "bounce" out of difficult spots in the loss landscape (like flat areas called saddle points or narrow valleys) instead of just slowing down or getting stuck. This is different from "refraction," which just adjusts speed.
+
+For each idea, provide a catchy title, a brief goal, and a potential approach. Frame it for a proposal.`;
+            const ideas = await callGemini(prompt);
+            showModal("✨ Future Research Ideas", ideas);
+        });
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+             // Initial call to set active nav link
+            window.onscroll();
+            // Initial call to set paradox view
+            updateParadoxView('small');
+        });
+
+    </script>
+</body>
+</html>

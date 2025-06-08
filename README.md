@@ -1,8 +1,12 @@
-## 📝 Note on Writing Assistance
+# 📝 Note on AI Tool Usage
 
-Someone asked whether I used LLMs to write my research paper. To be clear: I did use LLMs to translate and polish my English writing, as I'm a non-native speaker. However, all the research ideas, experimental design, and analysis are my original work.
+Someone asked whether I used LLMs to write my research paper. To be clear:
+- I used LLMs to translate and polish my English writing (non-native speaker)
+- I used them to discuss and validate mathematical proofs (like a 24/7 colleague)
+- All core ideas, experiments, and analysis are my original work
+- The novel insight of using ray tracing for optimization is mine alone
 
-If using language tools disqualifies research, then by that logic, we should reject any paper that used spell-checkers, grammar assistants, or benefited from native speaker proofreading. The scientific merit lies in the content, not in who helped polish the prose.
+If using such tools disqualifies research, then we should also reject papers that used spell-checkers, discussed ideas with colleagues, or received any form of assistance. The scientific merit lies in the original contributions, not in the tools used to refine them.
 
 ---
 

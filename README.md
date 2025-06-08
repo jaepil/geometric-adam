@@ -1,3 +1,11 @@
+## 📝 Note on Writing Assistance
+
+Someone asked whether I used LLMs to write my research paper. To be clear: I did use LLMs to translate and polish my English writing, as I'm a non-native speaker. However, all the research ideas, experimental design, and analysis are my original work.
+
+If using language tools disqualifies research, then by that logic, we should reject any paper that used spell-checkers, grammar assistants, or benefited from native speaker proofreading. The scientific merit lies in the content, not in who helped polish the prose.
+
+---
+
 # Geometric Adam: Ray Tracing-Inspired Adaptive Optimization
 
 A new kind of optimization algorithm that applies ray tracing principles from computer graphics to neural network training, achieving unprecedented stability and performance improvements.

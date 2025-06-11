@@ -1,6 +1,14 @@
 # ⚠️ Important Notice
 
-**Note: This project is not completed but rather in a continuous experimental phase. We have confirmed that Geometric Adam remains stable without diverging under conditions where Adam diverges, and we plan to conduct additional experiments to observe how Geometric Adam behaves under conditions where Adam is stable. Therefore, this should be considered more as a transparent disclosure of the experimentation and idea development process rather than a formal release. The reason for proceeding this way is that we have discovered phenomena that cannot be explained by existing optimization theory, making the optimizer's performance itself a secondary concern. We are still validating the phenomena I have discovered (or believe I have discovered), and we hope to receive feedback from those with expertise in this area.**
+**This project is an ongoing experimental journey, not a finished product:**
+
+- **What we've discovered**: Geometric Adam stays stable and converges successfully in conditions where standard Adam optimizer diverges and fails
+- **What we're still exploring**: How Geometric Adam behaves when Adam is already stable - will it match or exceed Adam's performance?
+- **Why we're sharing now**: We've discovered phenomena that existing optimization theory cannot explain, and we believe in transparent research
+- **Our primary focus**: Understanding these unexplained theoretical phenomena is more important to us than just optimizer performance metrics
+- **What we need**: We're actively seeking feedback and insights from experts who might help us understand what we've discovered (or think we've discovered)
+
+*This is an invitation to join our exploration, not a claim of a finished solution.*
 
 ---
 

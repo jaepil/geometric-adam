@@ -1,3 +1,9 @@
+# ⚠️ Important Notice
+
+**Note: This project is not completed but rather in a continuous experimental phase. We have confirmed that Geometric Adam remains stable without diverging under conditions where Adam diverges, and we plan to conduct additional experiments to observe how Geometric Adam behaves under conditions where Adam is stable. Therefore, this should be considered more as a transparent disclosure of the experimentation and idea development process rather than a formal release. The reason for proceeding this way is that we have discovered phenomena that cannot be explained by existing optimization theory, making the optimizer's performance itself a secondary concern. We are still validating the phenomena I have discovered (or believe I have discovered), and we hope to receive feedback from those with expertise in this area.**
+
+---
+
 # 📝 Note on AI Tool Usage
 
 Someone asked whether I used LLMs to write my research paper. To be clear:
@@ -140,21 +146,6 @@ Geometric Adam excels in scenarios requiring:
 - **Robustness** to hyperparameter choices
 - **Long training schedules** without divergence
 - **Superior final performance** over training speed
-
-## Citation
-
-```bibtex
-@misc{jeong2025geometric,
-  title={Geometric Adam: Ray Tracing-Inspired Adaptive Optimization},
-  author={Jeong, Jaepil},
-  institution={Cognica, Inc.},
-  journal={OSF Preprints},
-  year={2025},
-  eprint={10.31219/osf.io/dm5hn_v1},
-  code={https://github.com/jaepil/geometric-adam},
-  url={https://doi.org/10.31219/osf.io/dm5hn_v1}
-}
-```
 
 ## Contributing
 
